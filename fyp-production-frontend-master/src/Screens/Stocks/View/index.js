@@ -17,7 +17,7 @@ const ViewStocks = ({ user }) => {
             window.ethereum.request({ method: 'eth_requestAccounts' })
                 .then(accounts => setAccount(accounts[0]))
                 .catch(error => console.error(error));
-            const contractInstance = new web3Instance.eth.Contract(MedisecureABI, '0x20B29cbe2b77157069Af59171366E5a7aA00958b');
+            const contractInstance = new web3Instance.eth.Contract(MedisecureABI, '0x7822e2724462b80a1B56082F01e4A4a1fe8cf69D');
             setContract(contractInstance);
         } else {
             alert('Please install MetaMask!');

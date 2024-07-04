@@ -132,6 +132,30 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "order_id",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "status",
+				"type": "string"
+			}
+		],
+		"name": "update_order_status",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "view_all_medicines",
 		"outputs": [
@@ -223,9 +247,9 @@
 						"type": "string"
 					},
 					{
-						"internalType": "enum IMedisecure.Status",
+						"internalType": "string",
 						"name": "status",
-						"type": "uint8"
+						"type": "string"
 					}
 				],
 				"internalType": "struct IMedisecure.Order[]",
@@ -385,9 +409,9 @@
 						"type": "string"
 					},
 					{
-						"internalType": "enum IMedisecure.Status",
+						"internalType": "string",
 						"name": "status",
-						"type": "uint8"
+						"type": "string"
 					}
 				],
 				"internalType": "struct IMedisecure.Order",
@@ -441,9 +465,9 @@
 						"type": "string"
 					},
 					{
-						"internalType": "enum IMedisecure.Status",
+						"internalType": "string",
 						"name": "status",
-						"type": "uint8"
+						"type": "string"
 					}
 				],
 				"internalType": "struct IMedisecure.Order[]",

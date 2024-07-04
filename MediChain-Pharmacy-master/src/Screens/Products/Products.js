@@ -4,6 +4,8 @@ import { Card, Button, Modal, Row, Col, Form } from 'react-bootstrap';
 import MedisecureABI from "../MedisecureABI.json";
 import Swal from 'sweetalert2';
 import Web3 from "web3";
+import { v4 as uuidv4 } from 'uuid';
+
 
 const Products = () => {
 
@@ -12,6 +14,7 @@ const Products = () => {
   const Name = user?.name;
   const Email = user?.email;
   
+  const [medicineDetails, setMedicineDetails] = useState(null);
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
   const [medicines, setMedicines] = useState({});
@@ -36,7 +39,7 @@ const Products = () => {
       if (window.ethereum) {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         const web3 = new Web3(window.ethereum);
-        const contractAddress = "0x20B29cbe2b77157069Af59171366E5a7aA00958b";
+        const contractAddress = "0x7822e2724462b80a1B56082F01e4A4a1fe8cf69D";
         const contractInstance = new web3.eth.Contract(MedisecureABI, contractAddress);
         setWeb3(web3);
         setContract(contractInstance);
@@ -101,17 +104,22 @@ const Products = () => {
   const handleBuyConfirm = async () => {
     if (quantityToBuy <= parseInt(selectedStockForBuy.quantity)) {
       try {
-        await placeOrder(selectedStockForBuy.stock_id, quantityToBuy);
+        const randomTransactionId = await placeOrder(selectedStockForBuy.stock_id, quantityToBuy);
         // Fetch updated stock details from the blockchain
         const updatedStock = await contract.methods.view_stock_by_id(selectedStockForBuy.stock_id).call();
         setSelectedStockForBuy({
           ...selectedStockForBuy,
           quantity: updatedStock.quantity
         });
+  
+        // Fetch medicine details
+        const medicineDetails = await contract.methods.view_medicine_by_id(selectedMedicine.medicine_id).call();
+        setMedicineDetails(medicineDetails);
+  
         setShowBuyModal(false);
         Swal.fire({
           title: 'Success',
-          text: 'Purchase successful',
+          text: `Purchase successful. Order ID: ${randomTransactionId}`,
           icon: 'success',
           confirmButtonText: 'Ok',
         });
@@ -131,20 +139,27 @@ const Products = () => {
         confirmButtonText: 'Ok',
       });
     }
-  };
+  };  
 
   const placeOrder = async (stockId, quantity) => {
     try {
       const accounts = await window.ethereum.request({ method: "eth_accounts" });
       const account = accounts[0];
-
+      
+      // Generate a random transaction-like string
+      const randomTransactionId = uuidv4();
+    
       // Interaction with the smart contract to place the order
-      await contract.methods.add_order(orderId, selectedMedicine.medicine_id, quantity, Name).send({ from: account });
+      await contract.methods
+        .add_order(randomTransactionId, selectedMedicine.medicine_id, quantity, Name)
+        .send({ from: account });
+    
+      return randomTransactionId; // Return the random transaction-like string
     } catch (error) {
       throw new Error(`Failed to place order: ${error.message}`);
     }
   };
-
+  
   const handleShowDescriptionModal = (description) => {
     setFullDescription(description);
     setShowDescriptionModal(true);
@@ -220,6 +235,21 @@ const Products = () => {
           </div>
         )}
       </div>
+      {medicineDetails && (
+        <div className='prod__medicine-details'>
+          <Card className='prod__card'>
+            <Card.Body>
+              <Card.Title>{medicineDetails.name}</Card.Title>
+              <Card.Text>Medicine ID: {medicineDetails.medicine_id}</Card.Text>
+              <Card.Text>No of Units: {quantityToBuy}</Card.Text>
+              <Card.Text>Status: pending</Card.Text>
+              <Card.Text>Manufacturer: {medicineDetails.manufacturer}</Card.Text>
+              <Card.Text>Price per unit: {selectedStockForBuy.price}</Card.Text>
+              <Card.Text>Total Price: {selectedStockForBuy.price * quantityToBuy}</Card.Text>
+            </Card.Body>
+          </Card>
+        </div>
+      )}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Stock Information</Modal.Title>
@@ -231,8 +261,8 @@ const Products = () => {
                 <p>Stock ID: {stock.stock_id}</p>
                 <p>Price: {stock.price}</p>
                 <p>Quantity: {stock.quantity}</p>
-                <p>Manufacture Date: {new Date(stock.manufacture_date * 1000).toLocaleDateString()}</p>
-                <p>Expiry Date: {new Date(stock.expiry_date * 1000).toLocaleDateString()}</p>
+                <p>Manufacture Date: {new Date(parseInt(stock.manufacture_date)).toLocaleDateString()}</p>
+                <p>Expiry Date: {new Date(parseInt(stock.expiry_date)).toLocaleDateString()}</p>
                 <Button onClick={() => handleBuyStockClick(stock)} className='prod__button'>Buy Stock</Button>
                 <hr />
               </div>
@@ -256,14 +286,6 @@ const Products = () => {
           <p>Price: {selectedStockForBuy?.price}</p>
           <p>Available Quantity: {selectedStockForBuy?.quantity}</p>
           <Form>
-            <Form.Group controlId="order">
-              <Form.Label>Order ID</Form.Label>
-              <Form.Control
-                type="text"
-                value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
-              />
-            </Form.Group>
             <Form.Group controlId="quantityToBuy">
               <Form.Label>Quantity to Buy</Form.Label>
               <Form.Control
@@ -300,6 +322,6 @@ const Products = () => {
       </Modal>
     </div>
   );
-};
+};  
 
 export default Products;

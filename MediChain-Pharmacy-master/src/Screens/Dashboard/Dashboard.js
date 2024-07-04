@@ -54,7 +54,7 @@ const Dashboard = () => {
       if (window.ethereum) {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         const web3 = new Web3(window.ethereum);
-        const contractAddress = "0x20B29cbe2b77157069Af59171366E5a7aA00958b";
+        const contractAddress = "0x7822e2724462b80a1B56082F01e4A4a1fe8cf69D";
         const contractInstance = new web3.eth.Contract(MedisecureABI, contractAddress);
         setWeb3(web3);
         setContract(contractInstance);

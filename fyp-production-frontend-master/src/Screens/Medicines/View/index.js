@@ -25,7 +25,7 @@ const ViewMedicines = ({ user, history }) => {
                     });
                     console.log(accounts);
                     const web3 = new Web3(window.ethereum);
-                    const contractAddress = "0x20B29cbe2b77157069Af59171366E5a7aA00958b"; // Replace with your contract address
+                    const contractAddress = "0x7822e2724462b80a1B56082F01e4A4a1fe8cf69D"; // Replace with your contract address
                     console.log(web3.utils.toChecksumAddress(contractAddress));
                     // Validate the contract address format
                     if (!web3.utils.isAddress(contractAddress)) {

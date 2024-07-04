@@ -1,43 +1,28 @@
+
+
 import React from 'react';
 
 const TableItem = ({ order, onClick }) => {
-    const { productionStock, distributor, qty, status } = order;
+    const { medicine_id, price, distributor, quantity, status } = order;
 
     const handleAccept = () => {
-        onClick("Accepted", order);
+        onClick("Accepted", order.order_id);
     };
 
     const handleReject = () => {
-        onClick("Rejected", order);
+        onClick("Rejected", order.order_id);
     };
 
     return (
         <tr>
-            <td className="text-center text-muted">{productionStock.medicine.name}</td>
+            <td className="text-center text-muted">{medicine_id}</td>
             <td>
-                <div className="widget-content p-0">
-                    <div className="widget-content-wrapper">
-                        <div className="widget-content-left mr-3">
-                            <div className="widget-content-left">
-                                <img
-                                    style={{ objectFit: "contain" }}
-                                    width={40}
-                                    height={30}
-                                    className="rounded-circle"
-                                    src={require("../assets/images/medichain.png")}
-                                    alt="Avatar"
-                                />
-                            </div>
-                        </div>
-                        <div className="widget-content-left flex2">
-                            <div className="widget-heading">{distributor.name}</div>
-                            <div className="widget-subheading opacity-7">{distributor.email}</div>
-                        </div>
-                    </div>
+                <div className="widget-content-left flex2">
+                    <div className="widget-heading">{distributor}</div>
                 </div>
             </td>
-            <td className="text-center">{productionStock.price * qty}</td>
-            <td className="text-center">{qty}</td>
+            <td className="text-center">{price} ETH</td>
+            <td className="text-center">{quantity}</td>
             <td className="text-center">
                 {status.toLowerCase() === "pending" && (
                     <div className="badge badge-warning">{status}</div>
@@ -82,8 +67,8 @@ const TableHead = () => {
     return (
         <thead>
             <tr>
-                <th className="text-center">Medicine Name</th>
-                <th>Name</th>
+                <th className="text-center">Medicine ID</th>
+                <th>Distributor</th>
                 <th className="text-center">Price</th>
                 <th className="text-center">Quantity</th>
                 <th className="text-center">Status</th>
@@ -93,13 +78,16 @@ const TableHead = () => {
     );
 };
 
+
 const OrderTable = ({ onClick = () => {}, orders }) => {
     return (
         <div className="table-responsive">
             <table className="align-middle mb-0 table table-borderless table-striped table-hover">
                 <TableHead />
                 <tbody>
-                    <TableItem onClick={onClick} orders={orders} />
+                    {orders.map((order, index) => (
+                        <TableItem key={index} order={order} onClick={onClick} />
+                    ))}
                 </tbody>
             </table>
         </div>
